@@ -1,0 +1,141 @@
+{
+    "firewall": {
+        "ipv6-name": {
+            "wan_in-6": {
+                "default-action":     "drop",
+                "description":        "wan_in",
+                "enable-default-log": "''",
+                "rule": {
+                    "10": {
+                        "action":      "accept",
+                        "description": "Allow Enabled/Related state",
+                        "state": {
+                            "established": "enable",
+                            "related":     "enable"
+                        }
+                    },
+                    "20": {
+                        "action":      "drop",
+                        "description": "Drop Invalid state",
+                        "log":         "enable",
+                        "state": {
+                            "invalid": "enable"
+                        }
+                    },
+                    "50": {
+                        "action":      "accept",
+                        "description": "Allow ICMPv6",
+                        "log":         "enable",
+                        "protocol":    "icmpv6"
+                    }
+                }
+            },
+            "wan_local-6": {
+                "default-action":     "drop",
+                "description":        "wan_local",
+                "enable-default-log": "''",
+                "rule": {
+                    "10": {
+                        "action":      "accept",
+                        "description": "Allow Enabled/Related state",
+                        "state": {
+                            "established": "enable",
+                            "related":     "enable"
+                        }
+                    },
+                    "20": {
+                        "action":      "drop",
+                        "description": "Drop Invalid state",
+                        "log":         "enable",
+                        "state": {
+                            "invalid": "enable"
+                        }
+                    },
+                    "50": {
+                        "action":      "accept",
+                        "description": "Allow ICMPv6",
+                        "log":         "enable",
+                        "protocol":    "icmpv6"
+                    },
+                    "60": {
+                        "action":      "accept",
+                        "description": "DHCPv6",
+                        "protocol":    "udp",
+                        "destination": {
+                            "port": "546"
+                        },
+                        "source": {
+                            "port": "547"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "interfaces": {
+        "ethernet": {
+            "eth0": {
+                "dhcpv6-pd": {
+                    "pd": {
+                        "0": {
+                            "interface": {
+                                "eth1": {
+                                    "host-address": "::1",
+                                    "prefix-id": ":0",
+                                    "service": "slaac"
+                                },
+                                "eth1.41": {
+                                    "host-address": "::1",
+                                    "prefix-id": ":1",
+                                    "service": "slaac"
+                                },
+                                "eth1.42": {
+                                    "host-address": "::1",
+                                    "prefix-id": ":2",
+                                    "service": "slaac"
+                                },
+                                "eth1.45": {
+                                    "host-address": "::1",
+                                    "prefix-id": ":5",
+                                    "service": "slaac"
+                                }
+                            },
+                            "prefix-length": "/60"
+                        }
+                    },
+                    "rapid-commit": "enable"
+                },
+                "firewall": {
+                    "in": {
+                        "ipv6-name": "wan_in-6"
+                    },
+                    "local": {
+                        "ipv6-name": "wan_local-6"
+                    }
+                }
+            },
+            "eth1": {
+                "ipv6": {
+                    "dup-addr-detect-transmits": "1",
+                    "router-advert": {
+                        "cur-hop-limit":     "64",
+                        "link-mtu":          "0",
+                        "managed-flag":      "true",
+                        "max-interval":      "120",
+                        "other-config-flag": "false",
+                        "prefix": {
+                            "::/60": {
+                                "autonomous-flag": "true",
+                                "on-link-flag":    "true",
+                                "valid-lifetime":  "2592000"
+                            }
+                        },
+                        "reachable-time": "0",
+                        "retrans-timer":  "0",
+                        "send-advert":    "true"
+                    }
+                }
+            }
+        }
+    }
+}
