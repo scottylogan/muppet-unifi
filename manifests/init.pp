@@ -24,29 +24,40 @@ class unifi {
 
   include apt
 
-  apt::source { 'UniFi APT Repo':
+  apt::source { 'unifi-stable':
     location => 'http://www.ubnt.com/downloads/unifi/debian',
     key      => '4A228B2D358A5094178285BE06E85760C0A52C50',
     release  => 'stable',
     repos    => 'ubiquiti',
+    before   => Package['unifi'],
+  }
+
+  package { 'java8':
+    ensure => latest,
+    name   => 'oracle-java8-jdk',
   }
 
   package { 'unifi':
     ensure  => latest,
     require => [
-      Apt_Source['UniFi APT Repo'],
+      Package['java8'],
       Class['apt::update'],
     ]
   }
 
-  file { '/usr/lib/unifi/data/sites/default/config.gateway.json':
-    ensure  => file,
-    owner   => 0,
+  file {
+    [
+      '/var/log/unifi',
+      '/var/lib/unifi',
+      '/var/lib/unifi/backup',
+      '/var/lib/unifi/db',
+      '/var/lib/unifi/sites',
+    ]:
+    ensure  => directory,
+    owner   => 'unifi',
     group   => 0,
-    mode    => '0640',
-    source  => "puppet:///modules/${module_name}/config.gateway.json",
+    mode    => '0750',
     require => Package['unifi'],
   }
-
 }
 
